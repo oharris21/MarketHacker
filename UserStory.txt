@@ -1,0 +1,55 @@
+*** UI ***
+- Use angular CLI to generate your project and stub everything out. 
+
+- Keep the Hotlist in a sidebar on all screens with an abbreviated view. And then also have an option to select it and 
+look at the full data for it. 
+
+- Have JS call stock screener endpoint each minute to update hot list
+
+- since search endpoint doesn't return any ticker data, have a "view quote" option on the side of each stock quote that
+comes back from a search in the ui. It will fire off a ws call to get the quote with using the symbol or something. 
+
+- also add an optional exchange parameter to the search in the ui. 
+
+- search could be get quote or search-ticker depending on if it's a complete symbol or not. Can we make conditional logic 
+for that? 
+
+
+ *** BACK END ***
+- You might find that you want to do away with the five minute dip calculator and some other functions after you have 
+some other functions working and that is quite alright. It seems kind of primitive to me. We might be able to use 
+percentChange of some other variables to find dips more accurately and with less code. This is getting clearer as we 
+work on it so it's all good to delete things when you find a better way. 
+
+- As we make the front end, we'll figure out exactly how we want to use our endpoints and how we want to parse the data
+and such. It will be a work in progress, so no problems here. We'll probably be calling some StockCalculator methods from 
+the ws functions and maybe still having to make a Stock inheritance model to bind the data to. Because remember, we're not
+always gonna be returning the FMP data. Sometimes it will be our custom data. 
+
+
+
+*** STRETCH GOALS ***
+- back end logic that calculates the best price range to sell at. Basically the inverse of the resistance level calculator. 
+
+- front end logic that finds the difference of the two and takes in input for how many shares and gives you a "profit 
+estimate" 
+
+
+
+*** NOTES ***
+- make sure that the support level is understood to be a range, starting with the price and then minus 1% 
+
+- $14/mo for 300 requests/min. Have JS call stock screener endpoint each minute to update hot list!!! Let's Fucking 
+gooo!!! 
+
+- create a repo on git and push this code up when you're ready
+
+// Could we do a "hot list" of say 20 or 50 or 100 stocks for every request? Cause I think this 
+	// might be too dry if the only data comes from the user requesting a specific stock. If you were
+	// demo-ing this to somebody, they might make 5 requests for a stock and all of them could likely 
+	// not have any buying signs, so the app would look kinda dry without that. This way, with a "hot 
+	// list" you can always have 1 or 2 stocks to show off that do have buying signs. "Hot list" criteria
+	// could be the 20 most volatile, the 20 with the most volume, something like that? 
+	
+	// Can we use the stock screener endpoint? That would be killer! We could dynamically select our hot list
+	// all from that!
