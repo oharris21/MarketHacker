@@ -2,7 +2,6 @@ package com.markethacker;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.DecimalFormat;
@@ -19,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.markethacker.entities.StockDetailed;
 import com.markethacker.entities.StockOverview;
-import com.markethacker.stocklogic.StockCalculator;
+import com.markethacker.service.StockCalculator;
 import com.markethacker.testbase.TestBase;
 
 @SpringBootTest
@@ -30,8 +29,7 @@ class StockCalculatorTests {
 	TestBase testBase = new TestBase(); 
 	
 	@Test
-	void contextLoads() {
-	}
+	void contextLoads() {}
 	
 	/**
 	 * Is the calculatePercentages function returning the correct values based on the price in the object
@@ -73,23 +71,26 @@ class StockCalculatorTests {
 		// test with fiveMinuteDipTrueObject1
 		JSONArray array = testBase.readResourceFileToJSONArray("templates/json/MockFiveMinuteDipTrueObject1.json");
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
-		Boolean fiveMinuteDip = stockCalculator.fiveMinuteDipFinder(historicalDataList); 
+		Map<String, Object> fiveMinuteDipInfo = stockCalculator.fiveMinuteDipFinder(historicalDataList); 
 		
-		assertTrue(fiveMinuteDip == true);
+		assertTrue(fiveMinuteDipInfo.get("fiveMinuteDip") == (Boolean) true);
+		assertTrue(df.format(fiveMinuteDipInfo.get("fiveMinuteDipPercentage")).equals("0.9"));
 		
 		// test with fiveMinuteDipFalse1Object1
 		array = testBase.readResourceFileToJSONArray("templates/json/MockFiveMinuteDipFalseObject1.json");
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
-		fiveMinuteDip = stockCalculator.fiveMinuteDipFinder(historicalDataList);
+		fiveMinuteDipInfo = stockCalculator.fiveMinuteDipFinder(historicalDataList);
 		
-		assertTrue(fiveMinuteDip == false);
+		assertTrue(fiveMinuteDipInfo.get("fiveMinuteDip") == (Boolean) false);
+		assertTrue((Double) fiveMinuteDipInfo.get("fiveMinuteDipPercentage") == 0.00);
 		
 		// test with fiveMinuteDipFalseObject2
 		array = testBase.readResourceFileToJSONArray("templates/json/MockFiveMinuteDipFalseObject2.json");
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
-		fiveMinuteDip = stockCalculator.fiveMinuteDipFinder(historicalDataList);
+		fiveMinuteDipInfo = stockCalculator.fiveMinuteDipFinder(historicalDataList);
 		
-		assertTrue(fiveMinuteDip == false);
+		assertTrue(fiveMinuteDipInfo.get("fiveMinuteDip") == (Boolean) false);
+		assertTrue((Double) fiveMinuteDipInfo.get("fiveMinuteDipPercentage") == 0.00);
 	}
 	
 	/**
@@ -136,7 +137,7 @@ class StockCalculatorTests {
 	 * @throws JSONException
 	 */
 	@Test
-	public void bigDipFinderReturnsCorrectPercentChanceTest() throws JSONException {
+	public void bigDipFinderReturnsCorrectPercentChangeTest() throws JSONException {
 		List<StockOverview> historicalDataList = new ArrayList<>();  
 		Map<String, Object> bigDipInfo = new HashMap<>(); 
 		
@@ -145,28 +146,28 @@ class StockCalculatorTests {
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
 		bigDipInfo = stockCalculator.bigDipFinder(historicalDataList); 
 		
-		assertTrue(Double.valueOf(df.format((Double) bigDipInfo.get("percentChange"))) == 5.9);
+		assertTrue(df.format(bigDipInfo.get("bigDipPercentage")).equals("5.8"));
 		
 		// test with bigDipTrueObject2
 		array = testBase.readResourceFileToJSONArray("templates/json/MockBigDipTrueObject2.json");
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
 		bigDipInfo = stockCalculator.bigDipFinder(historicalDataList); 
 		
-		assertTrue(Double.valueOf(df.format((Double) bigDipInfo.get("percentChange"))) == 9.9);
+		assertTrue(df.format(bigDipInfo.get("bigDipPercentage")).equals("9.9"));
 		
 		// test with bigDipTrueObject3
 		array = testBase.readResourceFileToJSONArray("templates/json/MockBigDipTrueObject3.json");
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
 		bigDipInfo = stockCalculator.bigDipFinder(historicalDataList); 
 		
-		assertTrue(Double.valueOf(df.format((Double) bigDipInfo.get("percentChange"))) == 13.8);
+		assertTrue(df.format(bigDipInfo.get("bigDipPercentage")).equals("13.8"));
 		
 		// test with bigDipFalseObject1
 		array = testBase.readResourceFileToJSONArray("templates/json/MockBigDipFalseObject1.json");
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
 		bigDipInfo = stockCalculator.bigDipFinder(historicalDataList); 
 		
-		assertNull(bigDipInfo.get("percentChange"));
+		assertTrue((Double) bigDipInfo.get("bigDipPercentage") == 0.00);
 	}
 	
 	/**
@@ -200,15 +201,15 @@ class StockCalculatorTests {
 	@Test
 	public void supportLevelCalculatorTest() throws JSONException {
 		List<StockOverview> historicalDataList = new ArrayList<>();  
-		ArrayList<Object> supportLevelInfo = new ArrayList<>(); 
+		Map<String, Object> supportLevelInfo = new HashMap<>(); 
 		
 		// test with MockHistoricalDataObject1.json
 		JSONArray array = testBase.readResourceFileToJSONArray("templates/json/MockHistoricalDataObject1.json");
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
 		supportLevelInfo = stockCalculator.supportLevelCalculator(historicalDataList);
-		Double lowestPrice = (Double) supportLevelInfo.get(0); 
-		Integer timesTested = (Integer) supportLevelInfo.get(1); 
-		String grade = supportLevelInfo.get(2).toString();
+		Double lowestPrice = (Double) supportLevelInfo.get("supportLevelPrice"); 
+		Integer timesTested = (Integer) supportLevelInfo.get("supportLevelTestedCount"); 
+		String grade = supportLevelInfo.get("supportLevelStrength").toString();
 		
 		assertNotNull(supportLevelInfo); 
 		assertTrue(lowestPrice == 22.63); 
@@ -219,9 +220,9 @@ class StockCalculatorTests {
 		array = testBase.readResourceFileToJSONArray("templates/json/MockHistoricalDataObject2.json");
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
 		supportLevelInfo = stockCalculator.supportLevelCalculator(historicalDataList);
-		lowestPrice = (Double) supportLevelInfo.get(0); 
-		timesTested = (Integer) supportLevelInfo.get(1); 
-		grade = supportLevelInfo.get(2).toString();
+		lowestPrice = (Double) supportLevelInfo.get("supportLevelPrice"); 
+		timesTested = (Integer) supportLevelInfo.get("supportLevelTestedCount"); 
+		grade = supportLevelInfo.get("supportLevelStrength").toString();
 		
 		assertNotNull(supportLevelInfo); 
 		assertTrue(lowestPrice == 1518.21); 
@@ -232,9 +233,9 @@ class StockCalculatorTests {
 		array = testBase.readResourceFileToJSONArray("templates/json/MockHistoricalDataObject3.json");
 		historicalDataList = testBase.setStockOverviewListFromJSONArray(array); 
 		supportLevelInfo = stockCalculator.supportLevelCalculator(historicalDataList);
-		lowestPrice = (Double) supportLevelInfo.get(0); 
-		timesTested = (Integer) supportLevelInfo.get(1); 
-		grade = supportLevelInfo.get(2).toString();
+		lowestPrice = (Double) supportLevelInfo.get("supportLevelPrice"); 
+		timesTested = (Integer) supportLevelInfo.get("supportLevelTestedCount"); 
+		grade = supportLevelInfo.get("supportLevelStrength").toString();
 		
 		assertNotNull(supportLevelInfo); 
 		assertTrue(lowestPrice == 130.63); 
@@ -260,10 +261,10 @@ class StockCalculatorTests {
 		assertTrue(supportLevelStrengthGrade.equals("B"));
 		
 		supportLevelStrengthGrade = stockCalculator.calculateSupportLevelStrength(5); 
-		assertTrue(supportLevelStrengthGrade.equals("B"));
+		assertTrue(supportLevelStrengthGrade.equals("A"));
 		
 		supportLevelStrengthGrade = stockCalculator.calculateSupportLevelStrength(2); 
-		assertTrue(supportLevelStrengthGrade.equals("C"));
+		assertTrue(supportLevelStrengthGrade.equals("D"));
 		
 		supportLevelStrengthGrade = stockCalculator.calculateSupportLevelStrength(3); 
 		assertTrue(supportLevelStrengthGrade.equals("C"));

@@ -1,14 +1,18 @@
-package com.markethacker.stocklogic;
+package com.markethacker.service;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
+
 import com.markethacker.entities.StockOverview;
 
+@Service
 public class StockCalculator {
+	
+	DecimalFormat df = new DecimalFormat("#.##");
 	
 	/**
 	 * Calculate the percent values of a stock price from 1% to 10% 
@@ -17,8 +21,6 @@ public class StockCalculator {
 	 */
 	public Map<String, Double> calculatePercentages(Double price) {
 		Map<String, Double> percentages = new HashMap<>();
-		DecimalFormat df = new DecimalFormat("#.##");
-		
 		percentages.put("1%", Double.valueOf(df.format(price / 100))); 
 		percentages.put("2%", Double.valueOf(df.format((price / 100) * 2))); 
 		percentages.put("3%", Double.valueOf(df.format((price / 100) * 3))); 
@@ -37,17 +39,20 @@ public class StockCalculator {
 	 * @param oneMinuteStockOverviews
 	 * @return
 	 */
-	public Boolean fiveMinuteDipFinder(List<StockOverview> oneMinuteStockOverviews) {
+	public Map<String, Object> fiveMinuteDipFinder(List<StockOverview> oneMinuteStockOverviews) {
+		Map<String, Object> fiveMinuteDipInfo = new HashMap<>(); 
 		boolean fiveMinuteDip = false; 
 		Double minuteOnePrice = null;
 		boolean skipMinuteTwo = false; 
 		boolean arriveAtMinuteThree = false; 
 		Double minuteThreePrice = null; 
 		boolean skipMinuteFour = false; 
+		Double minuteFivePrice = null; 
 		
 		for (int i = 0; i < oneMinuteStockOverviews.size(); i++) {
 			if (skipMinuteFour == true && oneMinuteStockOverviews.get(i).getClose() < minuteThreePrice) {
 				fiveMinuteDip = true; 
+				minuteFivePrice = oneMinuteStockOverviews.get(i).getClose(); 
 				break; 
 			}
 			if (minuteThreePrice != null && skipMinuteFour == false) {
@@ -75,7 +80,15 @@ public class StockCalculator {
 				break; 
 			}
 		}
-		return fiveMinuteDip; 
+		
+		if (fiveMinuteDip == true) {
+			fiveMinuteDipInfo.put("fiveMinuteDip", true);
+			fiveMinuteDipInfo.put("fiveMinuteDipPercentage", dipAmountCalculator(minuteFivePrice, minuteOnePrice));
+		} else {
+			fiveMinuteDipInfo.put("fiveMinuteDip", false);
+			fiveMinuteDipInfo.put("fiveMinuteDipPercentage", 0.00);
+		}
+		return fiveMinuteDipInfo; 
 	}
 	
 	/**
@@ -96,8 +109,8 @@ public class StockCalculator {
 				bigDipInfo.put("bigDipTF", true); 
 				
 				// get the percent change of the dip 
-				Double percentChange = dipAmountCalculator(currentPrice, oneMinuteStockOverviews.get(i).getClose()); 
-				bigDipInfo.put("percentChange", percentChange); 
+				Double bigDipPercentage = dipAmountCalculator(currentPrice, oneMinuteStockOverviews.get(i).getClose()); 
+				bigDipInfo.put("bigDipPercentage", bigDipPercentage); 
 				break; 
 			}
 			
@@ -107,6 +120,9 @@ public class StockCalculator {
 		// added eventually, even if it's false. Add it here, at the end of the function. 
 		if (!bigDipInfo.containsKey("bigDipTF")) {
 			bigDipInfo.put("bigDipTF", false); 
+		}
+		if (!bigDipInfo.containsKey("bigDipPercentage")) {
+			bigDipInfo.put("bigDipPercentage", 0.00); 
 		}
 		return bigDipInfo; 
 	}
@@ -119,7 +135,7 @@ public class StockCalculator {
 	 * @return
 	 */
 	public Double dipAmountCalculator(double currentPrice, double beginningOfDipPrice) {
-		return 100 - ((currentPrice / beginningOfDipPrice) * 100); 
+		return Double.valueOf(df.format(100 - ((currentPrice / beginningOfDipPrice) * 100))); 
 	}
 	
 	/**
@@ -131,8 +147,8 @@ public class StockCalculator {
 	 * @param stocks
 	 * @return
 	 */
-	public ArrayList<Object> supportLevelCalculator(List<StockOverview> oneMinuteStockOverviews) {
-		ArrayList<Object> supportLevelAndStrength = new ArrayList<>(); 
+	public Map<String, Object> supportLevelCalculator(List<StockOverview> oneMinuteStockOverviews) {
+		Map<String, Object> supportLevelAndStrength = new HashMap<>(); 
 		Double lowestPrice = null; 
 		Integer supportLevelTestedCount = 0; 
 		
@@ -166,9 +182,9 @@ public class StockCalculator {
 			}
 		}
 		
-		supportLevelAndStrength.add(lowestPrice);
-		supportLevelAndStrength.add(supportLevelTestedCount);
-		supportLevelAndStrength.add(calculateSupportLevelStrength(supportLevelTestedCount));
+		supportLevelAndStrength.put("supportLevelPrice", lowestPrice);
+		supportLevelAndStrength.put("supportLevelTestedCount", supportLevelTestedCount);
+		supportLevelAndStrength.put("supportLevelStrength", calculateSupportLevelStrength(supportLevelTestedCount));
 		return supportLevelAndStrength; 
 	}
 	
@@ -180,13 +196,16 @@ public class StockCalculator {
 	public String calculateSupportLevelStrength(Integer numberOfTimesTested) {
 		String grade = "F"; 
 		
-		if (numberOfTimesTested == 2 || numberOfTimesTested == 3) {
+		if (numberOfTimesTested == 2) {
+			grade = "D"; 
+		}
+		else if (numberOfTimesTested == 3) {
 			grade = "C"; 
 		}
-		else if (numberOfTimesTested == 4 || numberOfTimesTested == 5) {
+		else if (numberOfTimesTested == 4) {
 			grade = "B"; 
 		}
-		else if (numberOfTimesTested >= 6) {
+		else if (numberOfTimesTested >= 5) {
 			grade = "A"; 
 		}
 		

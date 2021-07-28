@@ -2,7 +2,9 @@ buildscript {
     repositories {
         jcenter()
     }
-    dependencies {}
+    dependencies {
+    	classpath 'org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}'
+    }
 }
 
 plugins {
@@ -17,7 +19,7 @@ targetCompatibility = '1.8'
 group = 'com.markethacker'
 version = '0.0.1-SNAPSHOT'
 
-repositories {
+repositories { 
 	mavenCentral()
 }
 

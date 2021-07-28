@@ -45,6 +45,7 @@ public class TestBase {
 		StockDetailed stockDetailed = new StockDetailed(); 
 		
 		stockDetailed.setSymbol(jsonObject.getString("symbol"));
+//		stockDetailed.setCompanyName(jsonObject.getString("companyName"));
 		stockDetailed.setName(jsonObject.getString("name"));
 		stockDetailed.setPrice(jsonObject.getDouble("price"));
 		stockDetailed.setChangesPercentage(jsonObject.getDouble("changesPercentage"));
@@ -63,7 +64,7 @@ public class TestBase {
 		stockDetailed.setPreviousClose(jsonObject.getDouble("previousClose"));
 		stockDetailed.setEps(jsonObject.getDouble("eps"));
 		stockDetailed.setEarningsAnnouncement(jsonObject.getString("earningsAnnouncement"));
-		stockDetailed.setSharesOutstanding(jsonObject.getInt("sharesOutstanding"));
+		stockDetailed.setSharesOutstanding(jsonObject.getLong("sharesOutstanding"));
 		return stockDetailed; 
 	}
 	

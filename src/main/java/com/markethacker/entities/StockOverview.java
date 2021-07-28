@@ -6,17 +6,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class StockOverview {
 	
 	public String date; 
-    public Double open; 
-    public Double low;
+    public Double open;//
+    public Double close;//
     public Double high;
-    public Double close; 
-    public Double volume;
-    public String symbol;
-    public String name; 
+    public Double low;
+    public Double volume;//
+    public String symbol;//
+    public String name; //
     public String currency; 
     public String stockExchange; 
     public String exchangeShortName; 
-    //ema
     
 	public String getDate() {
 		return date;

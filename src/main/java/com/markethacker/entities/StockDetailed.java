@@ -7,8 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StockDetailed {
 	
-	public String symbol;
-	public String name;
+	public String symbol;//
+	public String name; 
     public Double price; 
     public Double changesPercentage; 
     public Double change;
@@ -19,15 +19,15 @@ public class StockDetailed {
     public Double marketCap;
     public Double priceAvg50;
     public Double priceAvg200;
-    public Double volume;
+    public Double volume;//
     public Double avgVolume;
     public String exchange; 
-    public Double open;
+    public Double open;//
     public Double previousClose;
     public Double eps;
     public Double pe;
     public String earningsAnnouncement;
-    public Integer sharesOutstanding;
+    public Long sharesOutstanding;
     public Date  timestamp;
     public String companyName; 
     public String sector;
@@ -37,17 +37,19 @@ public class StockDetailed {
     public String isEtf; 
     public String isActivelyTrading; 
     
+    // hotlist and personal add ons 
+    public boolean bigDip; 
+    public Double bigDipPercentage; 
+    public Double supportLevelPrice;
+    public String supportLevelStrength;
+    public boolean fiveMinuteDip; 
+    public Double fiveMinuteDipPercentage; 
+    
 	public String getSymbol() {
 		return symbol;
 	}
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
 	}
 	public Double getPrice() {
 		return price;
@@ -157,10 +159,10 @@ public class StockDetailed {
 	public void setEarningsAnnouncement(String earningsAnnouncement) {
 		this.earningsAnnouncement = earningsAnnouncement;
 	}
-	public Integer getSharesOutstanding() {
+	public Long getSharesOutstanding() {
 		return sharesOutstanding;
 	}
-	public void setSharesOutstanding(Integer sharesOutstanding) {
+	public void setSharesOutstanding(Long sharesOutstanding) {
 		this.sharesOutstanding = sharesOutstanding;
 	}
 	public Date getTimestamp() {
@@ -210,5 +212,47 @@ public class StockDetailed {
 	}
 	public void setIsActivelyTrading(String isActivelyTrading) {
 		this.isActivelyTrading = isActivelyTrading;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public boolean getBigDip() {
+		return bigDip;
+	}
+	public void setBigDip(boolean bigDip) {
+		this.bigDip = bigDip;
+	}
+	public String getSupportLevelStrength() {
+		return supportLevelStrength;
+	}
+	public void setSupportLevelStrength(String supportLevelStrength) {
+		this.supportLevelStrength = supportLevelStrength;
+	}
+	public Double getSupportLevelPrice() {
+		return supportLevelPrice;
+	}
+	public void setSupportLevelPrice(Double supportLevel) {
+		this.supportLevelPrice = supportLevel;
+	}
+	public Double getBigDipPercentage() {
+		return bigDipPercentage;
+	}
+	public void setBigDipPercentage(Double bigDipPercentage) {
+		this.bigDipPercentage = bigDipPercentage;
+	}
+	public boolean getFiveMinuteDip() {
+		return fiveMinuteDip;
+	}
+	public void setFiveMinuteDip(boolean fiveMinuteDip) {
+		this.fiveMinuteDip = fiveMinuteDip;
+	}
+	public Double getFiveMinuteDipPercentage() {
+		return fiveMinuteDipPercentage;
+	}
+	public void setFiveMinuteDipPercentage(Double fiveMinuteDipPercentage) {
+		this.fiveMinuteDipPercentage = fiveMinuteDipPercentage;
 	}
 }
